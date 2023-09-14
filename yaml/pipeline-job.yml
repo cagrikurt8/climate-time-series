@@ -1,0 +1,67 @@
+$schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
+type: pipeline
+# This defines the inputs for the pipeline
+
+experiment_name: time-series-experiment
+#display_name: time-series-job
+
+inputs:
+  input_data:
+    type: uri_file
+    mode: ro_mount
+    path: azureml:climate-data@latest
+  n_estimators: 1000
+
+outputs:
+  model_output:
+    type: mlflow_model
+    mode: rw_mount
+    
+# This defines the outputs for the pipeline
+#outputs:
+#  model_output:
+#    type: mlflow_model
+#    mode: rw_mount
+#    path: <path-to-your-folder>
+
+# The jobs to be run in the pipeline
+jobs:
+  prep_data: #change name as needed
+    type: command
+    #enter path to your component yaml
+    component: azureml:prep_data@latest
+    # invoke completions (Ctrl+Space, Cmd+Space) to see the list of computes available
+    compute: azureml:tst-cluster
+    # invoke completions (Ctrl+Space, Cmd+Space) to see the list of environments available
+    environment: azureml:train-env@latest
+    # This defines the inputs for job 1
+    inputs:
+      input_data:
+        type: uri_file
+        mode: ro_mount
+        path: ${{parent.inputs.input_data}}
+    # This defines the outputs for job 1
+    outputs:
+      output_data:
+        type: uri_folder
+        mode: rw_mount
+  train: #change name as needed
+    type: command
+    #enter path to your component yaml
+    component: azureml:train_model@latest
+    # invoke completions (Ctrl+Space, Cmd+Space) to see the list of computes available
+    compute: azureml:tst-cluster
+    # invoke completions (Ctrl+Space, Cmd+Space) to see the list of environments available
+    environment: azureml:train-env@latest
+    # This defines the inputs for job 2
+    inputs:
+      training_data:
+        type: uri_folder
+        mode: ro_mount
+        path: ${{parent.jobs.prep_data.outputs.output_data}}
+    # This defines the outputs for job 1
+    outputs:
+      model_output:
+        type: mlflow_model
+        mode: rw_mount
+        path: ${{parent.outputs.model_output}}

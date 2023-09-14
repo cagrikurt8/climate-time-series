@@ -21,7 +21,7 @@ def main(args):
     X_train, X_test, y_train, y_test = split_data(df)
 
     # train model
-    model = train_model(args.n_estimators, X_train, X_test, y_train, y_test)
+    model = train_model(int(args.n_estimators), X_train, X_test, y_train, y_test)
 
     eval_model(model, X_test, y_test)
 

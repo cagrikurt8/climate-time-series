@@ -21,7 +21,7 @@ def main(args):
     X_train, X_test, y_train, y_test = split_data(df)
 
     # train model
-    model = train_model(args.reg_rate, X_train, X_test, y_train, y_test)
+    model = train_model(args.n_estimators, X_train, X_test, y_train, y_test)
 
     eval_model(model, X_test, y_test)
 
@@ -44,10 +44,10 @@ def split_data(df):
     return X_train, X_test, y_train, y_test
 
 # function that trains the model
-def train_model(reg_rate, X_train, X_test, y_train, y_test):
-    mlflow.log_param("Regularization rate", reg_rate)
+def train_model(n_estimators, X_train, X_test, y_train, y_test):
+    mlflow.log_param("Number of Estimators", n_estimators)
     print("Training model...")
-    model = RandomForestRegressor(n_estimators=args.n_estimators, verbose=100).fit(X_train, y_train)
+    model = RandomForestRegressor(n_estimators=n_estimators, verbose=100).fit(X_train, y_train)
 
     mlflow.sklearn.save_model(model, args.model_output)
 

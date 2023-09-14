@@ -5,7 +5,7 @@ import argparse
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
 import matplotlib.pyplot as plt
@@ -21,9 +21,9 @@ def main(args):
     X_train, X_test, y_train, y_test = split_data(df)
 
     # train model
-    model = train_model(int(args.n_estimators), X_train, X_test, y_train, y_test)
+    model = train_model(args.reg_rate, X_train, X_test, y_train, y_test)
 
-    # eval_model(model, X_test, y_test)
+    eval_model(model, X_test, y_test)
 
 # function that reads the data
 def get_data(data_path):
@@ -44,10 +44,10 @@ def split_data(df):
     return X_train, X_test, y_train, y_test
 
 # function that trains the model
-def train_model(n_estimators, X_train, X_test, y_train, y_test):
-    mlflow.log_param("Number of Estimators", n_estimators)
+def train_model(reg_rate, X_train, X_test, y_train, y_test):
+    mlflow.log_param("Regularization Rate", reg_rate)
     print("Training model...")
-    model = RandomForestRegressor(n_estimators=n_estimators, verbose=100).fit(X_train, y_train)
+    model = LogisticRegression(C=1/reg_rate, solver='liblinear').fit(X_train, y_train)
 
     mlflow.sklearn.save_model(model, args.model_output)
 
@@ -84,8 +84,8 @@ def parse_args():
     # add arguments
     parser.add_argument("--training_data", dest='training_data',
                         type=str)
-    parser.add_argument("--n_estimators", dest='n_estimators',
-                        type=float, default=1000)
+    parser.add_argument("--reg_rate", dest='reg_rate',
+                        type=float, default=0.01)
     parser.add_argument("--model_output", dest='model_output',
                         type=str)
 

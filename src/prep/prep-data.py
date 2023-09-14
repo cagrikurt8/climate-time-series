@@ -13,9 +13,9 @@ def main(args):
 
     cleaned_data = clean_data(feature_engineered_data)
 
-    normalized_data = normalize_data(cleaned_data)
+    # normalized_data = normalize_data(cleaned_data) Tree bazlı modellerde normalization olumsuz etki yaratır.
 
-    output_df = normalized_data.to_csv((Path(args.output_data) / "climate-train-data.csv"))
+    output_df = clean_data.to_csv((Path(args.output_data) / "climate-train-data.csv"))
 
 # function that reads the data
 def get_data(path):

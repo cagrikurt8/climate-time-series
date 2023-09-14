@@ -23,7 +23,7 @@ def main(args):
     # train model
     model = train_model(int(args.n_estimators), X_train, X_test, y_train, y_test)
 
-    eval_model(model, X_test, y_test)
+    # eval_model(model, X_test, y_test)
 
 # function that reads the data
 def get_data(data_path):
